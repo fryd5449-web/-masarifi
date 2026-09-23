@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f6f1e8" />
   <title>حساب المصاريف الشهرية</title>
+
   <style>
     :root{
       --bg:#f6f1e8;
@@ -20,433 +21,2142 @@
       --shadow:0 14px 34px rgba(57,45,35,.08);
       --radius:22px;
     }
-    *{box-sizing:border-box}
-    html{background:var(--bg)}
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html{
+      background:var(--bg);
+    }
+
     body{
       margin:0;
       min-height:100vh;
       background:
-        radial-gradient(circle at top left, rgba(181,82,59,.08), transparent 34%),
+        radial-gradient(
+          circle at top left,
+          rgba(181,82,59,.08),
+          transparent 34%
+        ),
         var(--bg);
+
       color:var(--ink);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic","Tahoma",sans-serif;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans Arabic",
+        "Tahoma",
+        sans-serif;
+
       -webkit-font-smoothing:antialiased;
     }
-    button,input{font:inherit}
-    button{touch-action:manipulation}
+
+    button,
+    input{
+      font:inherit;
+    }
+
+    button{
+      touch-action:manipulation;
+    }
+
     .page{
       width:min(100%,560px);
       margin:0 auto;
+
       padding:
-        max(20px, env(safe-area-inset-top))
+        max(20px,env(safe-area-inset-top))
         16px
-        max(28px, env(safe-area-inset-bottom));
+        max(28px,env(safe-area-inset-bottom));
     }
+
     .header{
       padding:8px 4px 18px;
     }
+
     .header h1{
       margin:0 0 6px;
+
       font-size:25px;
       line-height:1.35;
       font-weight:800;
       letter-spacing:-.35px;
     }
+
     .header p{
       margin:0;
       color:var(--muted);
       font-size:14px;
     }
+
     .card{
       background:rgba(255,253,248,.92);
-      border:1px solid rgba(222,210,195,.82);
+
+      border:
+        1px solid
+        rgba(222,210,195,.82);
+
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-    }
-    .salary-card{
-      padding:18px;
+
       margin-bottom:14px;
     }
+
+    .card-padding{
+      padding:18px;
+    }
+
+    .salary-card{
+      padding:18px;
+    }
+
     .label{
       display:block;
+
       margin-bottom:8px;
+
       color:var(--muted);
       font-size:13px;
       font-weight:700;
     }
+
     .money-field{
       display:flex;
       align-items:center;
+
       gap:10px;
+
       min-height:58px;
       padding:0 15px;
+
       background:#fff;
+
       border:1px solid var(--line);
       border-radius:17px;
+
       transition:.18s ease;
     }
+
     .money-field:focus-within{
       border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(181,82,59,.10);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(181,82,59,.10);
     }
+
     .money-field input{
       width:100%;
       min-width:0;
+
       border:0;
       outline:0;
+
       background:transparent;
+
       color:var(--ink);
-      font-size:25px;
+
+      font-size:23px;
       font-weight:800;
+
       direction:ltr;
       text-align:right;
     }
+
     .currency{
       color:var(--muted);
+
       font-size:14px;
       font-weight:800;
+
       white-space:nowrap;
     }
+
     .summary{
       display:grid;
-      grid-template-columns:1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr;
+
       gap:10px;
+
       margin-top:12px;
     }
+
     .summary-box{
       min-height:84px;
+
       padding:13px;
+
       border-radius:17px;
+
       background:var(--surface-2);
+
       display:flex;
       flex-direction:column;
       justify-content:space-between;
     }
+
     .summary-box span{
       color:var(--muted);
       font-size:12px;
       font-weight:700;
     }
+
     .summary-box strong{
       font-size:19px;
       line-height:1.2;
+
       direction:ltr;
       text-align:right;
     }
-    .summary-box.remaining strong{color:var(--good)}
-    .summary-box.remaining.negative strong{color:var(--danger)}
+
+    .summary-box.remaining strong{
+      color:var(--good);
+    }
+
+    .summary-box.remaining.negative strong{
+      color:var(--danger);
+    }
+
     .expenses-card{
       overflow:hidden;
     }
+
     .section-head{
       display:flex;
+
       align-items:center;
       justify-content:space-between;
+
       gap:12px;
+
       padding:18px 18px 12px;
     }
+
     .section-head h2{
       margin:0;
       font-size:18px;
     }
+
     .section-head small{
       color:var(--muted);
       font-size:12px;
     }
+
+    .payment-summary{
+      display:grid;
+
+      grid-template-columns:
+        repeat(3,1fr);
+
+      gap:8px;
+
+      padding:0 18px 12px;
+    }
+
+    .payment-box{
+      padding:11px 9px;
+
+      background:var(--surface-2);
+
+      border-radius:14px;
+    }
+
+    .payment-box span{
+      display:block;
+
+      margin-bottom:5px;
+
+      color:var(--muted);
+
+      font-size:10px;
+      font-weight:700;
+    }
+
+    .payment-box strong{
+      display:block;
+
+      font-size:14px;
+
+      direction:ltr;
+      text-align:right;
+    }
+
     .rows{
       padding:0 10px 8px;
     }
+
     .expense-row{
       display:grid;
-      grid-template-columns:minmax(0,1fr) 112px 38px;
-      gap:8px;
+
+      grid-template-columns:
+        32px
+        minmax(0,1fr)
+        105px
+        38px;
+
+      gap:7px;
+
       align-items:center;
+
       padding:9px 8px;
-      border-top:1px solid rgba(222,210,195,.72);
+
+      border-top:
+        1px solid
+        rgba(222,210,195,.72);
     }
-    .expense-row:first-child{border-top:0}
+
+    .expense-row:first-child{
+      border-top:0;
+    }
+
+    .expense-row.paid{
+      opacity:.68;
+    }
+
+    .expense-row.paid .expense-name{
+      text-decoration:line-through;
+    }
+
+    .paid-checkbox{
+      appearance:none;
+
+      width:25px;
+      height:25px;
+
+      margin:0;
+
+      border:
+        2px solid
+        #c7b8a7;
+
+      border-radius:8px;
+
+      background:#fff;
+
+      display:grid;
+      place-content:center;
+
+      cursor:pointer;
+    }
+
+    .paid-checkbox::before{
+      content:"✓";
+
+      color:white;
+
+      font-size:16px;
+      font-weight:900;
+
+      transform:scale(0);
+
+      transition:.12s ease;
+    }
+
+    .paid-checkbox:checked{
+      background:var(--good);
+      border-color:var(--good);
+    }
+
+    .paid-checkbox:checked::before{
+      transform:scale(1);
+    }
+
     .expense-name,
     .expense-amount{
       width:100%;
       min-width:0;
+
       height:45px;
-      border:1px solid transparent;
+
+      border:
+        1px solid
+        transparent;
+
       border-radius:13px;
+
       outline:0;
+
       background:transparent;
+
       color:var(--ink);
+
       transition:.18s ease;
     }
+
     .expense-name{
       padding:0 10px;
+
       font-weight:700;
+
       text-align:right;
     }
+
     .expense-amount{
       padding:0 10px;
+
       text-align:left;
       direction:ltr;
+
       font-weight:800;
+
       background:#faf6ef;
+
       border-color:#eee3d5;
     }
+
     .expense-name:focus,
     .expense-amount:focus{
       background:#fff;
+
       border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(181,82,59,.09);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(181,82,59,.09);
     }
+
     .delete-btn{
       width:38px;
       height:38px;
+
       border:0;
       border-radius:12px;
+
       background:transparent;
+
       color:#9b776d;
+
       font-size:21px;
+
       cursor:pointer;
     }
-    .delete-btn:active{background:#f6e6e1}
+
+    .delete-btn:active{
+      background:#f6e6e1;
+    }
+
     .actions{
       padding:12px 18px 18px;
-      border-top:1px solid var(--line);
+
+      border-top:
+        1px solid
+        var(--line);
     }
+
     .add-btn{
       width:100%;
+
       min-height:50px;
+
       border:0;
       border-radius:15px;
+
       background:var(--accent);
+
       color:#fffaf5;
+
       font-weight:800;
+
       cursor:pointer;
-      box-shadow:0 8px 18px rgba(181,82,59,.18);
+
+      box-shadow:
+        0 8px 18px
+        rgba(181,82,59,.18);
     }
+
     .add-btn:active{
       transform:translateY(1px);
+
       background:var(--accent-dark);
     }
+
+    .section-title{
+      display:flex;
+
+      align-items:center;
+      justify-content:space-between;
+
+      gap:12px;
+
+      margin-bottom:14px;
+    }
+
+    .section-title h2{
+      margin:0;
+      font-size:18px;
+    }
+
+    .section-title small{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .field-grid{
+      display:grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:10px;
+    }
+
+    .field-block{
+      min-width:0;
+    }
+
+    .result-row{
+      display:flex;
+
+      align-items:center;
+      justify-content:space-between;
+
+      gap:12px;
+
+      margin-top:12px;
+      padding:13px 14px;
+
+      background:var(--surface-2);
+
+      border-radius:16px;
+    }
+
+    .result-row span{
+      color:var(--muted);
+
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .result-row strong{
+      font-size:18px;
+
+      direction:ltr;
+      text-align:right;
+    }
+
     .privacy-note{
       margin:13px 5px 0;
+
       text-align:center;
+
       color:var(--muted);
+
       font-size:11px;
       line-height:1.65;
     }
-    @media (max-width:380px){
-      .expense-row{grid-template-columns:minmax(0,1fr) 94px 36px}
-      .expense-row{gap:5px}
-      .page{padding-left:11px;padding-right:11px}
+
+    @media (max-width:420px){
+
+      .expense-row{
+        grid-template-columns:
+          29px
+          minmax(0,1fr)
+          90px
+          31px;
+
+        gap:5px;
+
+        padding-left:5px;
+        padding-right:5px;
+      }
+
+      .expense-name,
+      .expense-amount{
+        padding-left:7px;
+        padding-right:7px;
+      }
+
+      .payment-summary{
+        padding-left:12px;
+        padding-right:12px;
+      }
+
+      .payment-box{
+        padding:9px 7px;
+      }
+
+      .payment-box strong{
+        font-size:12px;
+      }
+    }
+
+    @media (max-width:360px){
+
+      .field-grid{
+        grid-template-columns:1fr;
+      }
+
+      .page{
+        padding-left:10px;
+        padding-right:10px;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <main class="page">
+
     <header class="header">
-      <h1>مصاريفي الشهرية</h1>
-      <p>عدّل الراتب والبنود مباشرة، والحساب يتحدث تلقائيًا.</p>
+
+      <h1>
+        مصاريفي الشهرية
+      </h1>
+
+      <p>
+        عدّل الأرقام مباشرة، وكل شيء يُحفظ تلقائيًا.
+      </p>
+
     </header>
 
-    <section class="card salary-card" aria-label="ملخص الشهر">
-      <label class="label" for="salary">الراتب الإجمالي</label>
+
+    <!-- الراتب -->
+
+    <section
+      class="card salary-card"
+      aria-label="ملخص الشهر"
+    >
+
+      <label
+        class="label"
+        for="salary"
+      >
+        الراتب الإجمالي
+      </label>
+
       <div class="money-field">
-        <input id="salary" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="الراتب الإجمالي" />
-        <span class="currency">ر.س</span>
+
+        <input
+          id="salary"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="0"
+          aria-label="الراتب الإجمالي"
+        />
+
+        <span class="currency">
+          ر.س
+        </span>
+
       </div>
+
 
       <div class="summary">
+
         <div class="summary-box">
-          <span>مجموع المصاريف</span>
-          <strong id="totalExpenses">0 ر.س</strong>
+
+          <span>
+            مجموع المصاريف
+          </span>
+
+          <strong id="totalExpenses">
+            0 ر.س
+          </strong>
+
         </div>
-        <div class="summary-box remaining" id="remainingBox">
-          <span>المتبقي</span>
-          <strong id="remaining">0 ر.س</strong>
+
+
+        <div
+          class="summary-box remaining"
+          id="remainingBox"
+        >
+
+          <span>
+            المتبقي من الراتب
+          </span>
+
+          <strong id="remaining">
+            0 ر.س
+          </strong>
+
         </div>
+
       </div>
+
     </section>
 
-    <section class="card expenses-card" aria-label="بنود المصاريف">
+
+    <!-- المصاريف -->
+
+    <section
+      class="card expenses-card"
+      aria-label="بنود المصاريف"
+    >
+
       <div class="section-head">
-        <h2>المصاريف</h2>
-        <small>الاسم والمبلغ قابلان للتعديل</small>
+
+        <h2>
+          المصاريف
+        </h2>
+
+        <small>
+          ✓ تم الدفع
+        </small>
+
       </div>
 
-      <div class="rows" id="rows"></div>
+
+      <div class="payment-summary">
+
+        <div class="payment-box">
+
+          <span>
+            الالتزامات
+          </span>
+
+          <strong id="obligationsTotal">
+            0 ر.س
+          </strong>
+
+        </div>
+
+
+        <div class="payment-box">
+
+          <span>
+            تم دفعه
+          </span>
+
+          <strong id="paidTotal">
+            0 ر.س
+          </strong>
+
+        </div>
+
+
+        <div class="payment-box">
+
+          <span>
+            باقي للدفع
+          </span>
+
+          <strong id="unpaidTotal">
+            0 ر.س
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="rows"
+        id="rows"
+      ></div>
+
 
       <div class="actions">
-        <button class="add-btn" id="addExpense" type="button">+ إضافة بند جديد</button>
+
+        <button
+          class="add-btn"
+          id="addExpense"
+          type="button"
+        >
+          + إضافة بند جديد
+        </button>
+
       </div>
+
     </section>
 
-    <p class="privacy-note">البيانات تُحفظ على هذا الجهاز داخل المتصفح فقط.</p>
+
+    <!-- المدخرات -->
+
+    <section
+      class="card card-padding"
+      aria-label="المدخرات"
+    >
+
+      <div class="section-title">
+
+        <h2>
+          المدخرات
+        </h2>
+
+        <small>
+          هدف الادخار
+        </small>
+
+      </div>
+
+
+      <div class="field-grid">
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="savingsGoal"
+          >
+            الهدف
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="savingsGoal"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="savingsCurrent"
+          >
+            المدخر حاليًا
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="savingsCurrent"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="result-row">
+
+        <span>
+          المتبقي للوصول للهدف
+        </span>
+
+        <strong id="savingsRemaining">
+          0 ر.س
+        </strong>
+
+      </div>
+
+    </section>
+
+
+    <!-- الفيزا -->
+
+    <section
+      class="card card-padding"
+      aria-label="الفيزا"
+    >
+
+      <div class="section-title">
+
+        <h2>
+          الفيزا
+        </h2>
+
+        <small>
+          متابعة مستقلة
+        </small>
+
+      </div>
+
+
+      <div class="field-grid">
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="visaLimit"
+          >
+            حد الفيزا
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="visaLimit"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="visaPurchases"
+          >
+            المشتريات بالفيزا
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="visaPurchases"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="visaDue"
+          >
+            المطلوب سداده
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="visaDue"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="result-row">
+
+        <span>
+          المتاح من حد الفيزا
+        </span>
+
+        <strong id="visaAvailable">
+          0 ر.س
+        </strong>
+
+      </div>
+
+    </section>
+
+
+    <!-- حساب المواطن -->
+
+    <section
+      class="card card-padding"
+      aria-label="حساب المواطن"
+    >
+
+      <div class="section-title">
+
+        <h2>
+          حساب المواطن
+        </h2>
+
+        <small>
+          متابعة الرصيد
+        </small>
+
+      </div>
+
+
+      <div class="field-grid">
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="citizenReceived"
+          >
+            المبلغ المستلم
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="citizenReceived"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="field-block">
+
+          <label
+            class="label"
+            for="citizenUsed"
+          >
+            المستخدم / المسحوب
+          </label>
+
+          <div class="money-field">
+
+            <input
+              id="citizenUsed"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+            />
+
+            <span class="currency">
+              ر.س
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="result-row">
+
+        <span>
+          المتبقي
+        </span>
+
+        <strong id="citizenRemaining">
+          0 ر.س
+        </strong>
+
+      </div>
+
+    </section>
+
+
+    <p class="privacy-note">
+      البيانات تُحفظ على هذا الجهاز داخل المتصفح فقط.
+    </p>
+
   </main>
 
+
   <script>
+
     "use strict";
 
-    const STORAGE_KEY = "monthly-expenses-v1";
+
+    /*
+      نستخدم نفس المفتاح القديم
+      حتى نحافظ على البيانات الموجودة.
+    */
+
+    const STORAGE_KEY =
+      "monthly-expenses-v1";
+
+
     const defaultData = {
-      salary: "",
-      expenses: [
-        { name: "الإيجار", amount: "" },
-        { name: "المشتريات", amount: "" },
-        { name: "القرض", amount: "" },
-        { name: "الكهرباء", amount: "" },
-        { name: "فاتورة الجوال", amount: "" }
-      ]
+
+      salary:"",
+
+      expenses:[
+
+        {
+          name:"الإيجار",
+          amount:"",
+          paid:false
+        },
+
+        {
+          name:"المشتريات",
+          amount:"",
+          paid:false
+        },
+
+        {
+          name:"القرض",
+          amount:"",
+          paid:false
+        },
+
+        {
+          name:"الكهرباء",
+          amount:"",
+          paid:false
+        },
+
+        {
+          name:"فاتورة الجوال",
+          amount:"",
+          paid:false
+        }
+
+      ],
+
+      savings:{
+        goal:"",
+        current:""
+      },
+
+      visa:{
+        limit:"",
+        purchases:"",
+        due:""
+      },
+
+      citizen:{
+        received:"",
+        used:""
+      }
+
     };
 
-    const salaryInput = document.getElementById("salary");
-    const rowsEl = document.getElementById("rows");
-    const addBtn = document.getElementById("addExpense");
-    const totalExpensesEl = document.getElementById("totalExpenses");
-    const remainingEl = document.getElementById("remaining");
-    const remainingBox = document.getElementById("remainingBox");
 
-    let state = loadState();
+    const salaryInput =
+      document.getElementById("salary");
 
-    function normalizeDigits(value) {
-      const arabic = "٠١٢٣٤٥٦٧٨٩";
-      const eastern = "۰۱۲۳۴۵۶۷۸۹";
+
+    const rowsEl =
+      document.getElementById("rows");
+
+
+    const addBtn =
+      document.getElementById("addExpense");
+
+
+    const totalExpensesEl =
+      document.getElementById("totalExpenses");
+
+
+    const remainingEl =
+      document.getElementById("remaining");
+
+
+    const remainingBox =
+      document.getElementById("remainingBox");
+
+
+    const obligationsTotalEl =
+      document.getElementById("obligationsTotal");
+
+
+    const paidTotalEl =
+      document.getElementById("paidTotal");
+
+
+    const unpaidTotalEl =
+      document.getElementById("unpaidTotal");
+
+
+    const savingsGoalInput =
+      document.getElementById("savingsGoal");
+
+
+    const savingsCurrentInput =
+      document.getElementById("savingsCurrent");
+
+
+    const savingsRemainingEl =
+      document.getElementById("savingsRemaining");
+
+
+    const visaLimitInput =
+      document.getElementById("visaLimit");
+
+
+    const visaPurchasesInput =
+      document.getElementById("visaPurchases");
+
+
+    const visaDueInput =
+      document.getElementById("visaDue");
+
+
+    const visaAvailableEl =
+      document.getElementById("visaAvailable");
+
+
+    const citizenReceivedInput =
+      document.getElementById("citizenReceived");
+
+
+    const citizenUsedInput =
+      document.getElementById("citizenUsed");
+
+
+    const citizenRemainingEl =
+      document.getElementById("citizenRemaining");
+
+
+    function cloneDefault(){
+
+      return JSON.parse(
+        JSON.stringify(defaultData)
+      );
+
+    }
+
+
+    function normalizeDigits(value){
+
+      const arabic =
+        "٠١٢٣٤٥٦٧٨٩";
+
+      const eastern =
+        "۰۱۲۳۴۵۶۷۸۹";
+
+
       return String(value ?? "")
-        .replace(/[٠-٩]/g, d => arabic.indexOf(d))
-        .replace(/[۰-۹]/g, d => eastern.indexOf(d))
-        .replace(/[٬,\s]/g, "")
-        .replace(/٫/g, ".");
+
+        .replace(
+          /[٠-٩]/g,
+          digit =>
+            arabic.indexOf(digit)
+        )
+
+        .replace(
+          /[۰-۹]/g,
+          digit =>
+            eastern.indexOf(digit)
+        )
+
+        .replace(
+          /[٬,\s]/g,
+          ""
+        )
+
+        .replace(
+          /٫/g,
+          "."
+        );
+
     }
 
-    function toNumber(value) {
-      const cleaned = normalizeDigits(value).replace(/[^\d.]/g, "");
-      const firstDot = cleaned.indexOf(".");
-      const safe = firstDot === -1
-        ? cleaned
-        : cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, "");
-      const n = Number(safe);
-      return Number.isFinite(n) ? n : 0;
+
+    function toNumber(value){
+
+      const cleaned =
+        normalizeDigits(value)
+          .replace(/[^\d.]/g,"");
+
+
+      const firstDot =
+        cleaned.indexOf(".");
+
+
+      const safe =
+        firstDot === -1
+
+          ? cleaned
+
+          : cleaned.slice(
+              0,
+              firstDot + 1
+            )
+
+            +
+
+            cleaned
+              .slice(firstDot + 1)
+              .replace(/\./g,"");
+
+
+      const number =
+        Number(safe);
+
+
+      return Number.isFinite(number)
+        ? number
+        : 0;
+
     }
 
-    function formatMoney(value) {
-      return new Intl.NumberFormat("ar-SA", {
-        maximumFractionDigits: 2
-      }).format(value) + " ر.س";
+
+    function formatMoney(value){
+
+      return new Intl.NumberFormat(
+        "ar-SA",
+        {
+          maximumFractionDigits:2
+        }
+      ).format(value)
+
+      +
+
+      " ر.س";
+
     }
 
-    function sanitizeState(data) {
-      if (!data || typeof data !== "object") return structuredClone(defaultData);
-      const expenses = Array.isArray(data.expenses)
-        ? data.expenses.slice(0, 100).map(item => ({
-            name: typeof item?.name === "string" ? item.name.slice(0, 60) : "",
-            amount: typeof item?.amount === "string" ? item.amount.slice(0, 30) : ""
-          }))
-        : structuredClone(defaultData.expenses);
+
+    function safeString(
+      value,
+      maxLength = 30
+    ){
+
+      return typeof value === "string"
+        ? value.slice(0,maxLength)
+        : "";
+
+    }
+
+
+    /*
+      هذه الدالة تقبل البيانات القديمة
+      وتضيف عليها الحقول الجديدة.
+    */
+
+    function sanitizeState(data){
+
+      const fallback =
+        cloneDefault();
+
+
+      if(
+        !data ||
+        typeof data !== "object"
+      ){
+
+        return fallback;
+
+      }
+
+
+      const expenses =
+        Array.isArray(data.expenses)
+
+          ? data.expenses
+              .slice(0,100)
+
+              .map(item => ({
+
+                name:
+                  safeString(
+                    item?.name,
+                    60
+                  ),
+
+                amount:
+                  safeString(
+                    item?.amount,
+                    30
+                  ),
+
+                paid:
+                  item?.paid === true
+
+              }))
+
+          : fallback.expenses;
+
 
       return {
-        salary: typeof data.salary === "string" ? data.salary.slice(0, 30) : "",
-        expenses: expenses.length ? expenses : structuredClone(defaultData.expenses)
+
+        salary:
+          safeString(
+            data.salary,
+            30
+          ),
+
+
+        expenses:
+          expenses.length
+            ? expenses
+            : fallback.expenses,
+
+
+        savings:{
+
+          goal:
+            safeString(
+              data.savings?.goal,
+              30
+            ),
+
+          current:
+            safeString(
+              data.savings?.current,
+              30
+            )
+
+        },
+
+
+        visa:{
+
+          limit:
+            safeString(
+              data.visa?.limit,
+              30
+            ),
+
+          purchases:
+            safeString(
+              data.visa?.purchases,
+              30
+            ),
+
+          due:
+            safeString(
+              data.visa?.due,
+              30
+            )
+
+        },
+
+
+        citizen:{
+
+          received:
+            safeString(
+              data.citizen?.received,
+              30
+            ),
+
+          used:
+            safeString(
+              data.citizen?.used,
+              30
+            )
+
+        }
+
       };
+
     }
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? sanitizeState(JSON.parse(raw)) : structuredClone(defaultData);
-      } catch {
-        return structuredClone(defaultData);
+
+    function loadState(){
+
+      try{
+
+        const raw =
+          localStorage.getItem(
+            STORAGE_KEY
+          );
+
+
+        return raw
+
+          ? sanitizeState(
+              JSON.parse(raw)
+            )
+
+          : cloneDefault();
+
       }
-    }
 
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // الصفحة تبقى شغالة حتى لو منع المتصفح التخزين.
+      catch{
+
+        return cloneDefault();
+
       }
+
     }
 
-    function makeInput(className, value, label, inputMode) {
-      const input = document.createElement("input");
-      input.className = className;
-      input.value = value;
-      input.setAttribute("aria-label", label);
-      input.autocomplete = "off";
-      if (inputMode) input.inputMode = inputMode;
+
+    let state =
+      loadState();
+
+
+    function saveState(){
+
+      try{
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(state)
+        );
+
+      }
+
+      catch{
+
+        /*
+          تبقى الصفحة تعمل
+          حتى لو التخزين غير متاح.
+        */
+
+      }
+
+    }
+
+
+    function makeInput(
+      className,
+      value,
+      label,
+      inputMode
+    ){
+
+      const input =
+        document.createElement(
+          "input"
+        );
+
+
+      input.className =
+        className;
+
+
+      input.value =
+        value;
+
+
+      input.setAttribute(
+        "aria-label",
+        label
+      );
+
+
+      input.autocomplete =
+        "off";
+
+
+      if(inputMode){
+
+        input.inputMode =
+          inputMode;
+
+      }
+
+
       return input;
+
     }
 
-    function renderRows() {
+
+    function renderRows(){
+
       rowsEl.replaceChildren();
 
-      state.expenses.forEach((expense, index) => {
-        const row = document.createElement("div");
-        row.className = "expense-row";
 
-        const nameInput = makeInput("expense-name", expense.name, "اسم بند المصروف");
-        nameInput.maxLength = 60;
-        nameInput.placeholder = "اسم المصروف";
-        nameInput.addEventListener("input", () => {
-          state.expenses[index].name = nameInput.value.slice(0, 60);
-          saveState();
-        });
+      state.expenses.forEach(
+        (expense,index) => {
 
-        const amountInput = makeInput("expense-amount", expense.amount, "مبلغ المصروف", "decimal");
-        amountInput.maxLength = 30;
-        amountInput.placeholder = "0";
-        amountInput.addEventListener("input", () => {
-          state.expenses[index].amount = amountInput.value.slice(0, 30);
-          saveState();
-          updateSummary();
-        });
+          const row =
+            document.createElement(
+              "div"
+            );
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.type = "button";
-        deleteBtn.className = "delete-btn";
-        deleteBtn.setAttribute("aria-label", "حذف البند");
-        deleteBtn.textContent = "×";
-        deleteBtn.addEventListener("click", () => {
-          state.expenses.splice(index, 1);
-          saveState();
-          renderRows();
-          updateSummary();
-        });
 
-        row.append(nameInput, amountInput, deleteBtn);
-        rowsEl.appendChild(row);
-      });
+          row.className =
+            "expense-row";
+
+
+          if(expense.paid){
+
+            row.classList.add(
+              "paid"
+            );
+
+          }
+
+
+          /*
+            تم الدفع
+          */
+
+          const paidCheckbox =
+            document.createElement(
+              "input"
+            );
+
+
+          paidCheckbox.type =
+            "checkbox";
+
+
+          paidCheckbox.className =
+            "paid-checkbox";
+
+
+          paidCheckbox.checked =
+            expense.paid;
+
+
+          paidCheckbox.setAttribute(
+            "aria-label",
+            "تم الدفع"
+          );
+
+
+          paidCheckbox.addEventListener(
+            "change",
+            () => {
+
+              state.expenses[index].paid =
+                paidCheckbox.checked;
+
+
+              saveState();
+
+              renderRows();
+
+              updateSummary();
+
+            }
+          );
+
+
+          /*
+            اسم المصروف
+          */
+
+          const nameInput =
+            makeInput(
+              "expense-name",
+              expense.name,
+              "اسم بند المصروف"
+            );
+
+
+          nameInput.maxLength =
+            60;
+
+
+          nameInput.placeholder =
+            "اسم المصروف";
+
+
+          nameInput.addEventListener(
+            "input",
+            () => {
+
+              state.expenses[index].name =
+                nameInput.value.slice(
+                  0,
+                  60
+                );
+
+
+              saveState();
+
+            }
+          );
+
+
+          /*
+            مبلغ المصروف
+          */
+
+          const amountInput =
+            makeInput(
+              "expense-amount",
+              expense.amount,
+              "مبلغ المصروف",
+              "decimal"
+            );
+
+
+          amountInput.maxLength =
+            30;
+
+
+          amountInput.placeholder =
+            "0";
+
+
+          amountInput.addEventListener(
+            "input",
+            () => {
+
+              state.expenses[index].amount =
+                amountInput.value.slice(
+                  0,
+                  30
+                );
+
+
+              saveState();
+
+              updateSummary();
+
+            }
+          );
+
+
+          /*
+            حذف البند
+          */
+
+          const deleteBtn =
+            document.createElement(
+              "button"
+            );
+
+
+          deleteBtn.type =
+            "button";
+
+
+          deleteBtn.className =
+            "delete-btn";
+
+
+          deleteBtn.setAttribute(
+            "aria-label",
+            "حذف البند"
+          );
+
+
+          deleteBtn.textContent =
+            "×";
+
+
+          deleteBtn.addEventListener(
+            "click",
+            () => {
+
+              state.expenses.splice(
+                index,
+                1
+              );
+
+
+              saveState();
+
+              renderRows();
+
+              updateSummary();
+
+            }
+          );
+
+
+          row.append(
+            paidCheckbox,
+            nameInput,
+            amountInput,
+            deleteBtn
+          );
+
+
+          rowsEl.appendChild(row);
+
+        }
+      );
+
     }
 
-    function updateSummary() {
-      const salary = toNumber(state.salary);
-      const total = state.expenses.reduce((sum, item) => sum + toNumber(item.amount), 0);
-      const remaining = salary - total;
 
-      totalExpensesEl.textContent = formatMoney(total);
-      remainingEl.textContent = formatMoney(remaining);
-      remainingBox.classList.toggle("negative", remaining < 0);
+    function updateSummary(){
+
+      const salary =
+        toNumber(
+          state.salary
+        );
+
+
+      const totalExpenses =
+        state.expenses.reduce(
+
+          (sum,item) =>
+            sum +
+            toNumber(item.amount),
+
+          0
+
+        );
+
+
+      const paidTotal =
+        state.expenses.reduce(
+
+          (sum,item) => {
+
+            if(!item.paid){
+
+              return sum;
+
+            }
+
+
+            return sum +
+              toNumber(item.amount);
+
+          },
+
+          0
+
+        );
+
+
+      const unpaidTotal =
+        totalExpenses -
+        paidTotal;
+
+
+      const remainingSalary =
+        salary -
+        totalExpenses;
+
+
+      totalExpensesEl.textContent =
+        formatMoney(
+          totalExpenses
+        );
+
+
+      obligationsTotalEl.textContent =
+        formatMoney(
+          totalExpenses
+        );
+
+
+      paidTotalEl.textContent =
+        formatMoney(
+          paidTotal
+        );
+
+
+      unpaidTotalEl.textContent =
+        formatMoney(
+          unpaidTotal
+        );
+
+
+      remainingEl.textContent =
+        formatMoney(
+          remainingSalary
+        );
+
+
+      remainingBox.classList.toggle(
+        "negative",
+        remainingSalary < 0
+      );
+
+
+      /*
+        المدخرات
+      */
+
+      const savingsGoal =
+        toNumber(
+          state.savings.goal
+        );
+
+
+      const savingsCurrent =
+        toNumber(
+          state.savings.current
+        );
+
+
+      const savingsRemaining =
+        Math.max(
+          savingsGoal -
+          savingsCurrent,
+          0
+        );
+
+
+      savingsRemainingEl.textContent =
+        formatMoney(
+          savingsRemaining
+        );
+
+
+      /*
+        الفيزا
+      */
+
+      const visaLimit =
+        toNumber(
+          state.visa.limit
+        );
+
+
+      const visaPurchases =
+        toNumber(
+          state.visa.purchases
+        );
+
+
+      const visaAvailable =
+        Math.max(
+          visaLimit -
+          visaPurchases,
+          0
+        );
+
+
+      visaAvailableEl.textContent =
+        formatMoney(
+          visaAvailable
+        );
+
+
+      /*
+        حساب المواطن
+      */
+
+      const citizenReceived =
+        toNumber(
+          state.citizen.received
+        );
+
+
+      const citizenUsed =
+        toNumber(
+          state.citizen.used
+        );
+
+
+      const citizenRemaining =
+        Math.max(
+          citizenReceived -
+          citizenUsed,
+          0
+        );
+
+
+      citizenRemainingEl.textContent =
+        formatMoney(
+          citizenRemaining
+        );
+
     }
 
-    salaryInput.value = state.salary;
-    salaryInput.addEventListener("input", () => {
-      state.salary = salaryInput.value.slice(0, 30);
-      saveState();
-      updateSummary();
-    });
 
-    addBtn.addEventListener("click", () => {
-      if (state.expenses.length >= 100) return;
-      state.expenses.push({ name: "بند جديد", amount: "" });
-      saveState();
-      renderRows();
-      updateSummary();
+    function bindMoneyInput(
+      input,
+      getValue,
+      setValue
+    ){
 
-      const names = rowsEl.querySelectorAll(".expense-name");
-      const latest = names[names.length - 1];
-      latest?.focus();
-      latest?.select();
-    });
+      input.value =
+        getValue();
+
+
+      input.addEventListener(
+        "input",
+        () => {
+
+          setValue(
+            input.value.slice(
+              0,
+              30
+            )
+          );
+
+
+          saveState();
+
+          updateSummary();
+
+        }
+      );
+
+    }
+
+
+    /*
+      ربط الحقول
+    */
+
+    bindMoneyInput(
+
+      salaryInput,
+
+      () =>
+        state.salary,
+
+      value =>
+        state.salary = value
+
+    );
+
+
+    bindMoneyInput(
+
+      savingsGoalInput,
+
+      () =>
+        state.savings.goal,
+
+      value =>
+        state.savings.goal = value
+
+    );
+
+
+    bindMoneyInput(
+
+      savingsCurrentInput,
+
+      () =>
+        state.savings.current,
+
+      value =>
+        state.savings.current = value
+
+    );
+
+
+    bindMoneyInput(
+
+      visaLimitInput,
+
+      () =>
+        state.visa.limit,
+
+      value =>
+        state.visa.limit = value
+
+    );
+
+
+    bindMoneyInput(
+
+      visaPurchasesInput,
+
+      () =>
+        state.visa.purchases,
+
+      value =>
+        state.visa.purchases = value
+
+    );
+
+
+    bindMoneyInput(
+
+      visaDueInput,
+
+      () =>
+        state.visa.due,
+
+      value =>
+        state.visa.due = value
+
+    );
+
+
+    bindMoneyInput(
+
+      citizenReceivedInput,
+
+      () =>
+        state.citizen.received,
+
+      value =>
+        state.citizen.received = value
+
+    );
+
+
+    bindMoneyInput(
+
+      citizenUsedInput,
+
+      () =>
+        state.citizen.used,
+
+      value =>
+        state.citizen.used = value
+
+    );
+
+
+    /*
+      إضافة مصروف جديد
+    */
+
+    addBtn.addEventListener(
+      "click",
+      () => {
+
+        if(
+          state.expenses.length >= 100
+        ){
+
+          return;
+
+        }
+
+
+        state.expenses.push({
+
+          name:"بند جديد",
+
+          amount:"",
+
+          paid:false
+
+        });
+
+
+        saveState();
+
+        renderRows();
+
+        updateSummary();
+
+
+        const names =
+          rowsEl.querySelectorAll(
+            ".expense-name"
+          );
+
+
+        const latest =
+          names[
+            names.length - 1
+          ];
+
+
+        latest?.focus();
+
+        latest?.select();
+
+      }
+    );
+
 
     renderRows();
+
     updateSummary();
+
   </script>
+
 </body>
 </html>
