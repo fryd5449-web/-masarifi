@@ -2344,30 +2344,301 @@ function renderVisas(){
 
   visas.forEach((visa,index) => {
 
-    const card = document.createElement("div");
-    card.className = "visa-item";
+    const card =
+      document.createElement("div");
 
-const visaHead = document.createElement("div");
+    card.className =
+      "visa-item";
 
-visaHead.style.display = "grid";
-visaHead.style.gridTemplateColumns = "minmax(0,1fr) 38px";
-visaHead.style.gap = "8px";
-visaHead.style.alignItems = "center";
-visaHead.style.marginBottom = "12px";
 
-    const nameInput = document.createElement("input");
+    // رأس بطاقة الفيزا
+    const visaHead =
+      document.createElement("div");
 
-    nameInput.className = "visa-name";
-    nameInput.value = visa.name;
-    nameInput.placeholder = "اسم الفيزا";
+    visaHead.style.display =
+      "grid";
 
-    nameInput.addEventListener("input",() => {
+    visaHead.style.gridTemplateColumns =
+      "minmax(0,1fr) 38px";
 
-      visas[index].name = nameInput.value;
+    visaHead.style.gap =
+      "8px";
 
-      saveVisas();
+    visaHead.style.alignItems =
+      "center";
 
-    });
+    visaHead.style.marginBottom =
+      "12px";
+
+
+    // اسم الفيزا
+    const nameInput =
+      document.createElement("input");
+
+    nameInput.className =
+      "visa-name";
+
+    nameInput.value =
+      visa.name;
+
+    nameInput.placeholder =
+      "اسم الفيزا";
+
+    nameInput.style.marginBottom =
+      "0";
+
+
+    nameInput.addEventListener(
+      "input",
+      () => {
+
+        visas[index].name =
+          nameInput.value;
+
+        saveVisas();
+
+      }
+    );
+
+
+    // زر حذف الفيزا
+    const deleteVisaBtn =
+      document.createElement("button");
+
+    deleteVisaBtn.type =
+      "button";
+
+    deleteVisaBtn.className =
+      "delete-btn";
+
+    deleteVisaBtn.textContent =
+      "×";
+
+    deleteVisaBtn.setAttribute(
+      "aria-label",
+      "حذف الفيزا"
+    );
+
+
+    deleteVisaBtn.addEventListener(
+      "click",
+      () => {
+
+        visas.splice(
+          index,
+          1
+        );
+
+        // إذا حذفت آخر فيزا
+        // نرجع بطاقة فارغة
+        if(visas.length === 0){
+
+          visas.push({
+            name:"فيزا 1",
+            limit:"",
+            purchases:"",
+            due:""
+          });
+
+        }
+
+        saveVisas();
+
+        renderVisas();
+
+      }
+    );
+
+
+    visaHead.append(
+      nameInput,
+      deleteVisaBtn
+    );
+
+
+    // شبكة حقول الفيزا
+    const grid =
+      document.createElement("div");
+
+    grid.className =
+      "visa-grid";
+
+
+    // قيمة المتاح
+    const availableValue =
+      document.createElement("strong");
+
+
+    function updateVisaAvailable(){
+
+      const limit =
+        toNumber(
+          visas[index].limit
+        );
+
+      const purchases =
+        toNumber(
+          visas[index].purchases
+        );
+
+      const available =
+        Math.max(
+          limit - purchases,
+          0
+        );
+
+      availableValue.textContent =
+        formatMoney(
+          available
+        );
+
+    }
+
+
+    function createField(
+      title,
+      key
+    ){
+
+      const field =
+        document.createElement("div");
+
+      field.className =
+        "visa-field";
+
+
+      const label =
+        document.createElement("label");
+
+      label.className =
+        "label";
+
+      label.textContent =
+        title;
+
+
+      const moneyField =
+        document.createElement("div");
+
+      moneyField.className =
+        "money-field";
+
+
+      const input =
+        document.createElement("input");
+
+      input.inputMode =
+        "decimal";
+
+      input.placeholder =
+        "0";
+
+      input.value =
+        visa[key] || "";
+
+
+      const currency =
+        document.createElement("span");
+
+      currency.className =
+        "currency";
+
+      currency.textContent =
+        "ر.س";
+
+
+      input.addEventListener(
+        "input",
+        () => {
+
+          visas[index][key] =
+            input.value;
+
+          saveVisas();
+
+          updateVisaAvailable();
+
+        }
+      );
+
+
+      moneyField.append(
+        input,
+        currency
+      );
+
+
+      field.append(
+        label,
+        moneyField
+      );
+
+
+      return field;
+
+    }
+
+
+    grid.append(
+
+      createField(
+        "حد الفيزا",
+        "limit"
+      ),
+
+      createField(
+        "المشتريات",
+        "purchases"
+      ),
+
+      createField(
+        "المطلوب سداده",
+        "due"
+      )
+
+    );
+
+
+    // المتاح من حد الفيزا
+    const availableBox =
+      document.createElement("div");
+
+    availableBox.className =
+      "visa-available";
+
+
+    const availableLabel =
+      document.createElement("span");
+
+    availableLabel.textContent =
+      "المتاح من حد الفيزا";
+
+
+    availableBox.append(
+      availableLabel,
+      availableValue
+    );
+
+
+    // الآن فقط نضيف العناصر
+    // بعد أن تم إنشاؤها كلها
+    card.append(
+      visaHead,
+      grid,
+      availableBox
+    );
+
+
+    visaListEl.appendChild(
+      card
+    );
+
+
+    updateVisaAvailable();
+
+  });
+
+}
 
 const deleteVisaBtn =
   document.createElement("button");
