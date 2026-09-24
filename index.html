@@ -2347,6 +2347,14 @@ function renderVisas(){
     const card = document.createElement("div");
     card.className = "visa-item";
 
+const visaHead = document.createElement("div");
+
+visaHead.style.display = "grid";
+visaHead.style.gridTemplateColumns = "minmax(0,1fr) 38px";
+visaHead.style.gap = "8px";
+visaHead.style.alignItems = "center";
+visaHead.style.marginBottom = "12px";
+
     const nameInput = document.createElement("input");
 
     nameInput.className = "visa-name";
@@ -2361,6 +2369,47 @@ function renderVisas(){
 
     });
 
+const deleteVisaBtn =
+  document.createElement("button");
+
+deleteVisaBtn.type = "button";
+deleteVisaBtn.className = "delete-btn";
+deleteVisaBtn.textContent = "×";
+
+deleteVisaBtn.setAttribute(
+  "aria-label",
+  "حذف الفيزا"
+);
+
+deleteVisaBtn.addEventListener(
+  "click",
+  () => {
+
+    visas.splice(index,1);
+
+    if(visas.length === 0){
+
+      visas.push({
+        name:"فيزا 1",
+        limit:"",
+        purchases:"",
+        due:""
+      });
+
+    }
+
+    saveVisas();
+
+    renderVisas();
+
+  }
+);
+
+card.append(
+  visaHead,
+  grid,
+  availableBox
+);
 
     const grid = document.createElement("div");
 
