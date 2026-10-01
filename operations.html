@@ -9,12 +9,12 @@
   <meta name="apple-mobile-web-app-title" content="فلافي" />
   <link rel="icon" type="image/png" href="./favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png" />
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="manifest" href="./manifest.webmanifest?v=figma-1" />
   <title>العمليات — فلافي</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=figma-1" />
 </head>
 <body>
 <header class="operations-topbar"><div><a href="./index.html" class="back-link" aria-label="العودة للرئيسية">‹</a><h1>العمليات</h1></div></header>
@@ -30,6 +30,6 @@
 </form></section>
 </div></main>
   <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-heading"><h2 id="modalTitle">إضافة عملية</h2><button id="closeModal" class="close-btn" type="button" aria-label="إغلاق">×</button></div><form id="transactionForm" class="form-grid"><input id="transactionId" type="hidden" /><input id="transactionType" type="hidden" /><div><label class="field-label" for="transactionAmount">المبلغ <span aria-hidden="true">*</span></label><input id="transactionAmount" class="money-input" inputmode="decimal" autocomplete="off" placeholder="0" required /></div><div><label id="titleLabel" class="field-label" for="transactionTitle">اسم المشتريات (اختياري)</label><input id="transactionTitle" class="text-input" maxlength="80" placeholder="مثال: دقيق وسكر" /></div><div><label class="field-label" for="transactionNote">ملاحظة (اختياري)</label><textarea id="transactionNote" maxlength="240" placeholder="أضف ملاحظة قصيرة"></textarea></div><div><label class="field-label" for="transactionDate">التاريخ</label><input id="transactionDate" class="date-input" type="date" required /></div><p id="formError" class="error" role="alert"></p><div class="form-actions"><button class="outline-btn" id="cancelModal" type="button">إلغاء</button><button class="primary-btn" type="submit">حفظ العملية</button></div></form></section></div>
-<script type="module" src="./app.js"></script>
+<script type="module" src="./app.js?v=figma-1"></script>
 <nav class="bottom-nav" aria-label="التنقل الرئيسي"><a class="nav-item" href="./index.html"><img src="./assets/figma/home.svg" alt="" width="22" height="22" /><span>الرئيسية</span></a><a class="nav-item active" href="./operations.html" aria-current="page"><img src="./assets/figma/operations.svg" alt="" width="22" height="22" /><span>العمليات</span></a><a class="nav-item" href="#reportCard"><img src="./assets/figma/reports.svg" alt="" width="22" height="22" /><span>التقارير</span></a></nav>
 </body></html>
