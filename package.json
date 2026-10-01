@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/logic.test.mjs",
-    "check": "node --check app.js && node --check logic.js"
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check app.js && node --check logic.js && node --check statement.js"
   }
 }

@@ -1,6 +1,57 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { calculateTotals, formatDate, formatMoney, sanitizeState } from '../logic.js';
+import { createStatement, buildStatementHtml } from '../statement.js';
+
+const fixture = () => ({ baseCapital: 5000, transactions: [
+  { id: 'p', type: 'purchase', amount: 200, title: 'دقيق', createdAt: '2026-10-01T12:00:00' },
+  { id: 's1', type: 'sale', amount: 3000, title: 'كيك', createdAt: '2026-10-01T12:00:00' },
+  { id: 's2', type: 'sale', amount: 3000, title: 'خبز', createdAt: '2026-10-31T23:59:00' },
+  { id: 'outside', type: 'sale', amount: 10, title: 'خارج الفترة', createdAt: '2026-11-01T00:00:00' },
+] });
+
+test('statement includes boundary dates, separates types and excludes outside period', () => {
+  const state = fixture(); const before = JSON.stringify(state);
+  const report = createStatement(state, '2026-10-01', '2026-10-31');
+  assert.equal(report.capital, 5200); assert.equal(report.salesTotal, 6000);
+  assert.equal(report.purchaseTotal, 200); assert.equal(report.movement, 5800);
+  assert.equal(report.sales.length, 2); assert.equal(report.purchases.length, 1);
+  assert.ok(report.sales.every(t => t.type === 'sale'));
+  assert.ok(report.purchases.every(t => t.type === 'purchase'));
+  assert.equal(JSON.stringify(state), before);
+});
+
+test('statement rejects missing, invalid and reversed dates', () => {
+  for (const [from,to] of [['',''],['2026-02-30','2026-03-01'],['2026-10-31','2026-10-01']]) {
+    assert.throws(() => createStatement(fixture(), from, to));
+  }
+});
+
+test('editing and deleting either type updates derived report and business totals', () => {
+  const state = fixture(); state.transactions = state.transactions.filter(t => t.id !== 'outside');
+  assert.equal(calculateTotals(state).profit, 800);
+  state.transactions[0].amount = 100;
+  state.transactions[1].amount = 2000;
+  assert.equal(createStatement(state, '2026-10-01','2026-10-31').movement, 4900);
+  state.transactions = state.transactions.filter(t => t.id !== 'p');
+  assert.equal(calculateTotals(state).capital, 5000);
+  state.transactions = state.transactions.filter(t => t.id !== 's1');
+  assert.equal(calculateTotals(state).salesTotal, 3000);
+});
+
+test('statement escapes user content and uses print-only layout', () => {
+  const state = fixture(); state.transactions[0].title = '<script>alert("x")</script>&';
+  const html = buildStatementHtml(createStatement(state,'2026-10-01','2026-10-31'));
+  assert.ok(html.includes('&lt;script&gt;')); assert.ok(!html.includes('<script>'));
+  assert.ok(html.includes('@media print')); assert.ok(html.includes('.toolbar{display:none}'));
+  assert.ok(html.includes('01/10/2026')); assert.ok(!html.includes('خارج الفترة'));
+});
+
+test('empty period produces a valid statement without changing current capital', () => {
+  const report = createStatement(fixture(),'2027-01-01','2027-01-31');
+  assert.equal(report.movement, 0); assert.equal(report.capital, 5200);
+  assert.ok(buildStatementHtml(report).includes('لا توجد عمليات خلال هذه الفترة.'));
+});
 
 test('Flavi business totals derive from base capital and transactions', () => {
   const state = sanitizeState({ baseCapital: 5000, transactions: [] });

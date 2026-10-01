@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4eadb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="فلافي" />
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>العمليات — فلافي</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<main class="page">
+<header class="header"><img class="logo" src="./assets/flavi-logo.png" alt="فلافي" /><div class="header-copy"><h1>العمليات</h1><a href="./index.html" class="back-link">العودة للرئيسية</a></div></header>
+<div class="stack">
+<section class="panel"><div class="panel-inner"><h2>كشف العمليات</h2><p class="eyebrow">اختر الفترة لإنشاء كشف مستقل قابل للطباعة.</p>
+<form id="reportForm" class="form-grid" novalidate>
+<div class="date-range"><div><label class="field-label" for="fromDate">من تاريخ</label><input id="fromDate" class="date-input" type="date" required /></div><div><label class="field-label" for="toDate">إلى تاريخ</label><input id="toDate" class="date-input" type="date" required /></div></div>
+<p id="reportError" class="error" role="alert"></p><div class="report-actions"><button class="outline-btn" type="submit">إنشاء الكشف</button><button class="primary-btn" id="printReport" type="button">طباعة / حفظ PDF</button></div>
+</form></div></section>
+<section class="panel" aria-labelledby="salesHeading"><div class="panel-inner"><h2 id="salesHeading">المبيعات</h2><p>إجمالي المبيعات: <strong id="salesValue" class="money"></strong></p><p class="eyebrow">عدد عمليات البيع: <span id="salesCount"></span></p></div><div id="salesList" class="operations-list"></div></section>
+<section class="panel" aria-labelledby="purchasesHeading"><div class="panel-inner"><h2 id="purchasesHeading">المشتريات</h2><p>إجمالي المشتريات: <strong id="purchasesValue" class="money"></strong></p><p class="eyebrow">عدد عمليات المشتريات: <span id="purchasesCount"></span></p></div><div id="purchasesList" class="operations-list"></div></section>
+</div></main>
+  <div id="modalBackdrop" class="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-heading"><h2 id="modalTitle">إضافة عملية</h2><button id="closeModal" class="close-btn" type="button" aria-label="إغلاق">×</button></div><form id="transactionForm" class="form-grid"><input id="transactionId" type="hidden" /><input id="transactionType" type="hidden" /><div><label class="field-label" for="transactionAmount">المبلغ <span aria-hidden="true">*</span></label><input id="transactionAmount" class="money-input" inputmode="decimal" autocomplete="off" placeholder="0" required /></div><div><label id="titleLabel" class="field-label" for="transactionTitle">اسم المشتريات (اختياري)</label><input id="transactionTitle" class="text-input" maxlength="80" placeholder="مثال: دقيق وسكر" /></div><div><label class="field-label" for="transactionNote">ملاحظة (اختياري)</label><textarea id="transactionNote" maxlength="240" placeholder="أضف ملاحظة قصيرة"></textarea></div><div><label class="field-label" for="transactionDate">التاريخ</label><input id="transactionDate" class="date-input" type="date" required /></div><p id="formError" class="error" role="alert"></p><div class="form-actions"><button class="outline-btn" id="cancelModal" type="button">إلغاء</button><button class="primary-btn" type="submit">حفظ العملية</button></div></form></section></div>
+<script type="module" src="./app.js"></script>
+</body></html>

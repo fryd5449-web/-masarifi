@@ -1,10 +1,10 @@
 import { STORAGE_KEY, calculateTotals, createDefaultState, createTransaction, formatDate, formatMoney, localDateValue, sanitizeState, toNumber } from './logic.js';
+import { createStatement, buildStatementHtml } from './statement.js';
 
 const $ = (selector) => document.querySelector(selector);
-const state = loadState();
-let showAll = false;
+let state = loadState();
 const elements = {
-  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), toggleAll: $('#toggleAll'), modalBackdrop: $('#modalBackdrop'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), formError: $('#formError'),
+  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), modalBackdrop: $('#modalBackdrop'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), formError: $('#formError'),
 };
 
 function loadState() {
@@ -17,22 +17,31 @@ function moneyMarkup(value) { const [amount, ...unit] = formatMoney(value).split
 
 function renderSummary() {
   const totals = calculateTotals(state);
+  if (!elements.capitalValue) {
+    const sales = state.transactions.filter((item) => item.type === 'sale');
+    const purchases = state.transactions.filter((item) => item.type === 'purchase');
+    elements.salesValue.textContent = formatMoney(totals.salesTotal);
+    $('#purchasesValue').textContent = formatMoney(totals.purchaseTotal);
+    $('#salesCount').textContent = String(sales.length);
+    $('#purchasesCount').textContent = String(purchases.length);
+    renderOperations($('#salesList'), sales);
+    renderOperations($('#purchasesList'), purchases);
+    return;
+  }
   elements.capitalValue.innerHTML = moneyMarkup(totals.capital);
   elements.salesValue.innerHTML = moneyMarkup(totals.salesTotal);
   elements.profitValue.innerHTML = moneyMarkup(Math.abs(totals.profit));
   elements.profitPanel.classList.toggle('negative', totals.profit < 0);
   elements.profitCaption.textContent = totals.profit < 0 ? 'المتبقي للوصول لنقطة التعادل' : 'صافي الأرباح بعد خصم رأس المال';
-  renderOperations();
+  renderOperations(elements.operationsList, [...state.transactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5));
 }
 
-function renderOperations() {
-  const transactions = [...state.transactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  const visible = showAll ? transactions : transactions.slice(0, 5);
-  elements.operationsList.replaceChildren();
+function renderOperations(container, transactions) {
+  const visible = [...transactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  container.replaceChildren();
   if (!visible.length) {
-    const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'لا توجد عمليات بعد. أضف أول مشتريات أو بيع للمشروع.'; elements.operationsList.append(empty); elements.toggleAll.hidden = true; return;
+    const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'لا توجد عمليات بعد.'; container.append(empty); return;
   }
-  elements.toggleAll.hidden = false; elements.toggleAll.textContent = showAll ? 'إخفاء السجل' : 'عرض الكل';
   visible.forEach((transaction) => {
     const row = document.createElement('article'); row.className = 'operation';
     const main = document.createElement('div'); main.className = 'operation-main';
@@ -44,7 +53,7 @@ function renderOperations() {
     const actions = document.createElement('div'); actions.className = 'operation-actions';
     const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.type = 'button'; edit.textContent = 'تعديل'; edit.addEventListener('click', () => openModal(transaction.type, transaction));
     const remove = document.createElement('button'); remove.className = 'icon-btn delete'; remove.type = 'button'; remove.textContent = 'حذف'; remove.addEventListener('click', () => { const index = state.transactions.findIndex((item) => item.id === transaction.id); if (index >= 0 && window.confirm('حذف هذه العملية؟')) { state.transactions.splice(index, 1); saveState(); renderSummary(); } });
-    actions.append(edit, remove); side.append(type, amount, actions); row.append(main, side); elements.operationsList.append(row);
+    actions.append(edit, remove); side.append(type, amount, actions); row.append(main, side); container.append(row);
   });
 }
 
@@ -55,8 +64,7 @@ function openModal(type, transaction) {
 function closeModal() { elements.modalBackdrop.hidden = true; elements.transactionForm.reset(); elements.formError.textContent = ''; }
 
 document.querySelectorAll('.add-transaction').forEach((button) => button.addEventListener('click', () => openModal(button.dataset.type)));
-$('#saveCapital').addEventListener('click', () => { state.baseCapital = toNumber(elements.baseCapital.value); elements.baseCapital.value = state.baseCapital || ''; saveState(); renderSummary(); });
-elements.toggleAll.addEventListener('click', () => { showAll = !showAll; renderOperations(); });
+$('#saveCapital')?.addEventListener('click', () => { state.baseCapital = toNumber(elements.baseCapital.value); elements.baseCapital.value = state.baseCapital || ''; saveState(); renderSummary(); });
 $('#closeModal').addEventListener('click', closeModal); $('#cancelModal').addEventListener('click', closeModal); elements.modalBackdrop.addEventListener('click', (event) => { if (event.target === elements.modalBackdrop) closeModal(); });
 elements.transactionForm.addEventListener('submit', (event) => {
   event.preventDefault(); const amount = toNumber(elements.transactionAmount.value); const date = elements.transactionDate.value;
@@ -66,4 +74,22 @@ elements.transactionForm.addEventListener('submit', (event) => {
   saveState(); closeModal(); renderSummary();
 });
 
-elements.baseCapital.value = state.baseCapital || ''; renderSummary();
+function openReport(print) {
+  const error = $('#reportError');
+  try {
+    const report = createStatement(state, $('#fromDate').value, $('#toDate').value);
+    const popup = window.open('', '_blank');
+    if (!popup) throw new Error('تعذر فتح الكشف. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.');
+    popup.document.open();
+    if (print) popup.addEventListener('load', () => { popup.focus(); popup.print(); }, { once: true });
+    popup.document.write(buildStatementHtml(report));
+    popup.document.close();
+    error.textContent = '';
+  } catch (failure) { error.textContent = failure.message || 'تعذر إنشاء الكشف. حاول مرة أخرى.'; }
+}
+$('#reportForm')?.addEventListener('submit', (event) => { event.preventDefault(); openReport(false); });
+$('#printReport')?.addEventListener('click', () => openReport(true));
+function refresh() { state = loadState(); if (elements.baseCapital) elements.baseCapital.value = state.baseCapital || ''; renderSummary(); }
+window.addEventListener('pageshow', refresh);
+window.addEventListener('storage', (event) => { if (event.key === STORAGE_KEY) refresh(); });
+refresh();
