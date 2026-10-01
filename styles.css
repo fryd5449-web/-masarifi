@@ -22,24 +22,19 @@
       min-height: 100vh;
       color: var(--ink);
       background: var(--bg);
-      font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif;
+      font-family: "Tajawal", -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
     button, input, textarea { font: inherit; }
     button { touch-action: manipulation; }
     .page { width: min(100%, 560px); margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 14px max(28px, env(safe-area-inset-bottom)); }
-    .logo { display: block; width: 200px; max-width: 56%; height: auto; mix-blend-mode: multiply; }
+    .logo { display: block; width: 200px; max-width: 56%; height: auto; }
     .brand-bar { width: 100%; background: var(--surface-soft); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
-    .brand-bar-inner { width: min(100%, 560px); margin-inline: auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-    .brand-bar .logo { width: 175px; max-width: none; flex-shrink: 0; object-fit: contain; }
-    .brand-bar p { margin: 0; min-width: 0; max-width: 190px; color: var(--muted); font-size: 14px; font-weight: 500; line-height: 1.65; text-align: right; }
+    .brand-bar-inner { width: min(100%, 560px); min-height: 130px; margin-inline: auto; padding: 6px 16px; display: flex; align-items: center; justify-content: center; }
+    .brand-bar .logo { width: 210px; max-width: 78vw; height: 130px; flex-shrink: 0; object-fit: contain; }
     .brand-bar + .page { padding-top: 12px; }
-    @media (max-width: 359px) {
-      .brand-bar-inner { gap: 10px; padding-inline: 14px; }
-      .brand-bar .logo { width: 150px; }
-      .brand-bar p { font-size: 13px; }
-    }
-    @media (min-width: 600px) { .brand-bar .logo { width: 210px; } }
+    @media (max-width: 359px) { .brand-bar-inner { min-height: 118px; } .brand-bar .logo { width: 188px; height: 118px; } }
+    @media (min-width: 600px) { .brand-bar .logo { width: 230px; height: 140px; } }
     .stack { display: grid; gap: 16px; }
     .panel { background: rgba(255, 250, 242, .93); border: 1px solid rgba(222, 200, 168, .82); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
     .money { direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
@@ -124,9 +119,8 @@
 
     .page { width: min(100%, 390px); padding: 16px 16px calc(100px + env(safe-area-inset-bottom)); }
     .brand-bar { background: #f4e8d6; border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
-    .brand-bar-inner { width: min(100%, 390px); height: 102px; padding: 10px 16px; gap: 12px; }
-    .brand-bar .logo { width: 76px; height: 76px; max-width: none; flex: 0 0 76px; border-radius: 0; object-fit: contain; mix-blend-mode: multiply; }
-    .brand-bar p { max-width: 150px; font-size: 13px; font-weight: 400; line-height: 1.7; color: var(--muted); }
+    .brand-bar-inner { width: min(100%, 390px); min-height: 130px; padding: 6px 16px; }
+    .brand-bar .logo { width: 210px; height: 130px; max-width: 78vw; flex: 0 1 auto; border-radius: 0; object-fit: contain; }
     .brand-bar + .page { padding-top: 16px; }
     .stack { gap: 16px; }
     .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); }
@@ -137,7 +131,7 @@
     .feature-copy { display: block; flex: 1 1 auto; min-width: 0; }
     .feature-copy h2 { margin: 0; color: var(--ink); font-size: 22px; line-height: 1.4; font-weight: 800; white-space: nowrap; }
     .feature-copy p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
-    .add-transaction { width: 84px; height: 54px; min-height: 54px; padding: 0 6px; border: 0; border-radius: 16px; color: #fff; font: 700 14px/1.2 "Cairo", sans-serif; }
+    .add-transaction { width: 84px; height: 54px; min-height: 54px; padding: 0 6px; border: 0; border-radius: 16px; color: #fff; font: 700 14px/1.2 "Tajawal", sans-serif; }
     .purchase-add { background: #66854b; }
     .sales-add { background: #9b5b34; }
     .sales-panel { display: grid; grid-template-columns: 1fr; gap: 12px; min-height: 152px; padding: 17px 14px 14px; }
@@ -157,8 +151,7 @@
     .profit-content { min-width: 0; flex: 1; }
     .profit-title-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
     .profit-title-row h2 { margin: 0; font-size: 26px; font-weight: 800; }
-    .auto-label { padding: 3px 9px; border-radius: 16px; color: #3d6b32; background: #ddeace; font-size: 12px; font-weight: 700; white-space: nowrap; }
-    .profit-caption { margin: 0 0 4px; font-size: 12px; line-height: 1.5; text-align: right; }
+    .profit-caption { margin: 2px 0 4px; font-size: 12px; line-height: 1.5; text-align: right; }
     .profit-value { color: #2f6a2b; text-align: right; font-size: clamp(27px,8vw,34px); }
     .profit-panel.negative .profit-value { color: var(--red); }
     .operations-panel { border-radius: 22px; }
@@ -176,14 +169,14 @@
     .operation-side { grid-column: 2; grid-row: 1; align-items: flex-start; justify-content: center; gap: 2px; }
     .operation-amount { font-size: 15px; }
     .operation-actions { gap: 3px; margin-top: 1px; }
-    .icon-btn { min-width: 40px; min-height: 38px; padding: 0 6px; border-radius: 10px; background: #fbf2e4; font: 600 11px/1 "Cairo",sans-serif; }
+    .icon-btn { min-width: 40px; min-height: 38px; padding: 0 6px; border-radius: 10px; background: #fbf2e4; font: 600 11px/1 "Tajawal",sans-serif; }
     .empty { padding: 30px 10px; color: var(--muted); font-size: 13px; }
     .note { display: none; }
     .operations-page { padding-top: 16px; }
     .operations-topbar { height: 88px; background: #f4e8d6; border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top); }
     .operations-topbar > div { position: relative; display: flex; align-items: center; justify-content: center; width: min(100%,390px); height: 87px; margin: auto; padding: 0 16px; }
     .operations-topbar h1 { margin: 0; font-size: 27px; font-weight: 800; }
-    .back-link { position: absolute; left: 16px; top: 12px; display: grid; place-items: center; width: 48px; height: 60px; padding: 0; color: var(--ink); font: 700 34px/1 "Cairo",sans-serif; text-decoration: none; }
+    .back-link { position: absolute; left: 16px; top: 12px; display: grid; place-items: center; width: 48px; height: 60px; padding: 0; color: var(--ink); font: 700 34px/1 "Tajawal",sans-serif; text-decoration: none; }
     .operations-page .stack { gap: 16px; }
     .operations-totals { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
     .total-card { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; min-height: 90px; padding: 13px 13px 8px; border-radius: 20px; box-shadow: none; }
@@ -211,9 +204,9 @@
     .statement-card .form-grid { gap: 7px; }
     .date-range { gap: 12px; }
     .date-range .field-label { margin-bottom: 5px; color: var(--muted); font-size: 12px; }
-    .date-input { min-height: 46px; padding: 0 7px; border-radius: 12px; background: #fbf2e4; font: 12px "Cairo",sans-serif; }
+    .date-input { min-height: 46px; padding: 0 7px; border-radius: 12px; background: #fbf2e4; font: 12px "Tajawal",sans-serif; }
     .report-actions { display: grid; gap: 7px; margin-top: 6px; }
-    .report-actions > button { width: 100%; min-height: 48px; border-radius: 16px; font: 700 14px "Cairo",sans-serif; }
+    .report-actions > button { width: 100%; min-height: 48px; border-radius: 16px; font: 700 14px "Tajawal",sans-serif; }
     .report-actions .primary-btn { background: #9b5b34; box-shadow: none; }
     .print-btn { color: var(--ink); background: #fbf2e4; border: 0; cursor: pointer; }
     .statement-card .error { margin: 0; }
@@ -222,9 +215,8 @@
     .nav-item img { flex: 0 0 22px; }
     .nav-item.active { color: var(--ink); background: #f1dec3; font-weight: 700; }
     @media (max-width: 359px) {
-      .brand-bar-inner { gap: 8px; padding-inline: 12px; }
-      .brand-bar .logo { width: 68px; height: 68px; flex-basis: 68px; }
-      .brand-bar p { font-size: 12px; }
+      .brand-bar-inner { min-height: 118px; padding-inline: 12px; }
+      .brand-bar .logo { width: 188px; height: 118px; flex-basis: auto; }
       .page { padding-inline: 12px; }
       .capital-illustration { width: 92px; }
       .capital-content { left: 112px; right: 12px; }
@@ -238,5 +230,29 @@
       .sales-top { padding-inline-start: 92px; }
       .sales-top .feature-copy { max-width: 138px; }
       .total-card { padding-inline: 9px; }
+    }
+
+    .pending-panel { padding: 12px 14px 5px; }
+    .pending-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; }
+    .pending-heading h2 { margin: 0; font-size: 20px; line-height: 1.4; font-weight: 800; }
+    .pending-add { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 84px; min-height: 44px; padding: 0 14px; color: white; background: var(--green); border: 0; border-radius: 14px; font: 700 15px/1.2 "Tajawal",sans-serif; cursor: pointer; }
+    .pending-add span { font-size: 20px; line-height: 1; }
+    .pending-orders-list { display: grid; }
+    .pending-order { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 12px 2px; border-top: 1px solid var(--line); }
+    .pending-order-details { min-width: 0; }
+    .pending-order-title { display: block; overflow-wrap: anywhere; font-size: 15px; line-height: 1.45; font-weight: 800; }
+    .pending-order-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .pending-order-amount { color: var(--brown-dark); font-weight: 800; direction: ltr; unicode-bidi: isolate; }
+    .pending-order-status { padding: 1px 7px; color: #785a2d; background: #f6ead4; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .pending-order-actions { display: flex; gap: 5px; }
+    .pending-order-actions button { min-width: 54px; min-height: 44px; padding: 0 9px; border: 0; border-radius: 12px; font: 700 13px/1 "Tajawal",sans-serif; cursor: pointer; }
+    .pending-confirm { color: #fff; background: var(--green); }
+    .pending-delete { color: var(--red); background: #fff0e9; }
+    .pending-empty { margin: 0; padding: 14px 4px 16px; color: var(--muted); text-align: center; font-size: 14px; }
+    @media (max-width: 359px) {
+      .pending-panel { padding-inline: 11px; }
+      .pending-heading h2 { font-size: 18px; }
+      .pending-order { grid-template-columns: minmax(0, 1fr); }
+      .pending-order-actions { justify-content: flex-start; }
     }
 

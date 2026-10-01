@@ -1,10 +1,10 @@
-import { STORAGE_KEY, calculateTotals, createDefaultState, createTransaction, formatDate, formatMoney, localDateValue, sanitizeState, toNumber } from './logic.js';
+import { STORAGE_KEY, addPendingOrder, calculateTotals, confirmPendingOrder, createDefaultState, createTransaction, deletePendingOrder, formatDate, formatDateTime, formatMoney, localDateValue, sanitizeState, toNumber } from './logic.js';
 import { createStatement, buildStatementHtml } from './statement.js';
 
 const $ = (selector) => document.querySelector(selector);
 let state = loadState();
 const elements = {
-  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), capitalEditForm: $('#capitalEditForm'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), modalBackdrop: $('#modalBackdrop'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), formError: $('#formError'),
+  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), capitalEditForm: $('#capitalEditForm'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), pendingOrdersList: $('#pendingOrdersList'), modalBackdrop: $('#modalBackdrop'), modal: $('.modal'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), transactionDateField: $('#transactionDateField'), submitTransaction: $('#submitTransaction'), formError: $('#formError'),
 };
 
 function loadState() {
@@ -32,8 +32,33 @@ function renderSummary() {
   elements.salesValue.innerHTML = moneyMarkup(totals.salesTotal);
   elements.profitValue.innerHTML = moneyMarkup(Math.abs(totals.profit));
   elements.profitPanel.classList.toggle('negative', totals.profit < 0);
-  elements.profitCaption.textContent = totals.profit < 0 ? 'المتبقي للوصول لنقطة التعادل' : 'صافي الأرباح بعد خصم رأس المال';
+  elements.profitCaption.textContent = totals.profit < 0 ? 'المتبقي للوصول لنقطة التعادل' : 'صافي الأرباح';
   renderOperations(elements.operationsList, [...state.transactions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5));
+  renderPendingOrders();
+}
+
+function renderPendingOrders() {
+  if (!elements.pendingOrdersList) return;
+  elements.pendingOrdersList.replaceChildren();
+  if (!state.pendingOrders.length) {
+    const empty = document.createElement('p'); empty.className = 'pending-empty'; empty.textContent = 'لا توجد طلبات جديدة'; elements.pendingOrdersList.append(empty); return;
+  }
+  [...state.pendingOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach((order) => {
+    const row = document.createElement('article'); row.className = 'pending-order';
+    const details = document.createElement('div'); details.className = 'pending-order-details';
+    const title = document.createElement('strong'); title.className = 'pending-order-title'; title.textContent = order.title;
+    const meta = document.createElement('div'); meta.className = 'pending-order-meta';
+    const amount = document.createElement('span'); amount.className = 'pending-order-amount'; amount.textContent = formatMoney(order.amount);
+    const status = document.createElement('span'); status.className = 'pending-order-status'; status.textContent = 'قيد التأكيد';
+    const date = document.createElement('time'); date.dateTime = order.createdAt; date.textContent = formatDateTime(order.createdAt);
+    meta.append(amount, status, date); details.append(title, meta);
+    const actions = document.createElement('div'); actions.className = 'pending-order-actions';
+    const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = 'pending-confirm'; confirm.textContent = 'تأكيد';
+    confirm.addEventListener('click', () => { state = confirmPendingOrder(state, order.id); saveState(); renderSummary(); });
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'pending-delete'; remove.textContent = 'حذف';
+    remove.addEventListener('click', () => { state = deletePendingOrder(state, order.id); saveState(); renderSummary(); });
+    actions.append(confirm, remove); row.append(details, actions); elements.pendingOrdersList.append(row);
+  });
 }
 
 function renderOperations(container, transactions) {
@@ -58,18 +83,35 @@ function renderOperations(container, transactions) {
 }
 
 function openModal(type, transaction) {
-  elements.transactionId.value = transaction?.id ?? ''; elements.transactionType.value = type; elements.modalTitle.textContent = transaction ? 'تعديل العملية' : type === 'sale' ? 'إضافة بيع' : 'إضافة مشتريات'; elements.titleLabel.textContent = type === 'sale' ? 'وصف البيع / المنتج (اختياري)' : 'اسم المشتريات (اختياري)'; elements.transactionAmount.value = transaction?.amount ?? ''; elements.transactionTitle.value = transaction?.title ?? ''; elements.transactionNote.value = transaction?.note ?? ''; elements.transactionDate.value = transaction ? localDateValue(new Date(transaction.createdAt)) : localDateValue(); elements.formError.textContent = ''; elements.modalBackdrop.hidden = false; elements.transactionAmount.focus();
+  const pending = type === 'pending';
+  elements.modal.classList.toggle('pending-mode', pending);
+  elements.transactionId.value = transaction?.id ?? ''; elements.transactionType.value = type;
+  elements.modalTitle.textContent = transaction ? 'تعديل العملية' : pending ? 'إضافة طلب جديد' : type === 'sale' ? 'إضافة بيع' : 'إضافة مشتريات';
+  elements.titleLabel.textContent = pending ? 'اسم الطلب' : type === 'sale' ? 'وصف البيع / المنتج (اختياري)' : 'اسم المشتريات (اختياري)';
+  elements.transactionTitle.required = pending;
+  elements.transactionTitle.placeholder = pending ? 'مثال: كيك شوكولاتة' : type === 'sale' ? 'مثال: كيك شوكولاتة' : 'مثال: دقيق وسكر';
+  elements.transactionDateField.hidden = pending;
+  elements.transactionDate.required = !pending;
+  elements.submitTransaction.textContent = pending ? 'حفظ الطلب' : 'حفظ العملية';
+  elements.transactionAmount.value = transaction?.amount ?? ''; elements.transactionTitle.value = transaction?.title ?? ''; elements.transactionNote.value = transaction?.note ?? ''; elements.transactionDate.value = transaction ? localDateValue(new Date(transaction.createdAt)) : localDateValue(); elements.formError.textContent = ''; elements.modalBackdrop.hidden = false; elements.transactionAmount.focus();
 }
 
-function closeModal() { elements.modalBackdrop.hidden = true; elements.transactionForm.reset(); elements.formError.textContent = ''; }
+function closeModal() { elements.modalBackdrop.hidden = true; elements.modal.classList.remove('pending-mode'); elements.transactionForm.reset(); elements.transactionTitle.required = false; elements.transactionDateField.hidden = false; elements.transactionDate.required = true; elements.submitTransaction.textContent = 'حفظ العملية'; elements.formError.textContent = ''; }
 
 document.querySelectorAll('.add-transaction').forEach((button) => button.addEventListener('click', () => openModal(button.dataset.type)));
+$('#addPendingOrder')?.addEventListener('click', () => openModal('pending'));
 $('#showCapitalEditor')?.addEventListener('click', () => { elements.baseCapital.value = state.baseCapital || ''; elements.capitalEditForm.hidden = false; elements.baseCapital.focus(); });
 $('#saveCapital')?.addEventListener('click', () => { state.baseCapital = toNumber(elements.baseCapital.value); elements.baseCapital.value = state.baseCapital || ''; saveState(); elements.capitalEditForm.hidden = true; renderSummary(); });
 $('#closeModal').addEventListener('click', closeModal); $('#cancelModal').addEventListener('click', closeModal); elements.modalBackdrop.addEventListener('click', (event) => { if (event.target === elements.modalBackdrop) closeModal(); });
 elements.transactionForm.addEventListener('submit', (event) => {
-  event.preventDefault(); const amount = toNumber(elements.transactionAmount.value); const date = elements.transactionDate.value;
-  if (amount <= 0 || !date) { elements.formError.textContent = 'اكتب مبلغًا صحيحًا واختر التاريخ.'; return; }
+  event.preventDefault(); const amount = toNumber(elements.transactionAmount.value); const date = elements.transactionDate.value; const title = elements.transactionTitle.value.trim();
+  if (amount <= 0 || (elements.transactionType.value !== 'pending' && !date)) { elements.formError.textContent = 'اكتب مبلغًا صحيحًا واختر التاريخ.'; return; }
+  if (elements.transactionType.value === 'pending') {
+    if (!title) { elements.formError.textContent = 'اكتب اسم الطلب.'; elements.transactionTitle.focus(); return; }
+    try { state = addPendingOrder(state, { amount, title, note: elements.transactionNote.value }); }
+    catch { elements.formError.textContent = 'تعذر حفظ الطلب. تحقق من الاسم والمبلغ.'; return; }
+    saveState(); closeModal(); renderSummary(); return;
+  }
   const transaction = createTransaction({ type: elements.transactionType.value, amount, title: elements.transactionTitle.value, note: elements.transactionNote.value, date }); const existingIndex = state.transactions.findIndex((item) => item.id === elements.transactionId.value);
   if (existingIndex >= 0) state.transactions[existingIndex] = { ...state.transactions[existingIndex], ...transaction, id: state.transactions[existingIndex].id }; else state.transactions.push(transaction);
   saveState(); closeModal(); renderSummary();

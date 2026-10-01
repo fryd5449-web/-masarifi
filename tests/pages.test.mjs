@@ -10,6 +10,15 @@ test('home links to separate operations and limits recent list to five', () => {
   assert.ok(!app.includes('showAll'));
 });
 
+test('pending orders card appears between purchases and sales and has explicit actions', () => {
+  const home = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  assert.ok(home.indexOf('id="pendingHeading"') > home.indexOf('id="purchasesHeading"'));
+  assert.ok(home.indexOf('id="pendingHeading"') < home.indexOf('id="salesHeading"'));
+  for (const operation of ['addPendingOrder', 'confirmPendingOrder', 'deletePendingOrder']) assert.ok(app.includes(operation));
+  assert.ok(home.includes('id="pendingOrdersList"'));
+});
+
 test('manifest and touch icons resolve under the GitHub Pages subpath', () => {
   const manifest = JSON.parse(readFileSync(new URL('../manifest.webmanifest', import.meta.url), 'utf8'));
   assert.equal(manifest.name, 'فلافي');

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calculateTotals, formatDate, formatMoney, sanitizeState } from '../logic.js';
+import { addPendingOrder, calculateTotals, confirmPendingOrder, deletePendingOrder, formatDate, formatMoney, sanitizeState } from '../logic.js';
 import { createStatement, buildStatementHtml } from '../statement.js';
 
 const fixture = () => ({ baseCapital: 5000, transactions: [
@@ -73,5 +73,34 @@ test('display formatting uses Western digits and Gregorian date', () => {
 });
 
 test('old Masareefi storage is not accepted as Flavi state', () => {
-  assert.deepEqual(sanitizeState({ salary: 10000, expenses: [{ name: 'الإيجار', amount: '2000' }] }), { baseCapital: 0, transactions: [] });
+  assert.deepEqual(sanitizeState({ salary: 10000, expenses: [{ name: 'الإيجار', amount: '2000' }] }), { baseCapital: 0, transactions: [], pendingOrders: [] });
+});
+
+test('pending orders remain separate until confirmed, then update existing sales totals', () => {
+  const state = sanitizeState({ baseCapital: 5000, transactions: [] });
+  const withOrder = addPendingOrder(state, { amount: 300, title: 'كيك شوكولاتة', createdAt: '2026-10-01T09:30:00.000Z' });
+  assert.equal(withOrder.pendingOrders.length, 1);
+  assert.equal(withOrder.transactions.length, 0);
+  assert.equal(calculateTotals(withOrder).salesTotal, 0);
+  assert.equal(createStatement(withOrder, '2026-10-01', '2026-10-01').sales.length, 0);
+  const confirmed = confirmPendingOrder(withOrder, withOrder.pendingOrders[0].id);
+  assert.equal(confirmed.pendingOrders.length, 0);
+  assert.equal(confirmed.transactions.length, 1);
+  assert.equal(confirmed.transactions[0].type, 'sale');
+  assert.equal(confirmed.transactions[0].createdAt, '2026-10-01T09:30:00.000Z');
+  assert.equal(calculateTotals(confirmed).salesTotal, 300);
+  assert.equal(calculateTotals(confirmed).profit, -4700);
+  const statement = createStatement(confirmed, '2026-10-01', '2026-10-01');
+  assert.equal(statement.sales.length, 1);
+  assert.equal(statement.sales[0].title, 'كيك شوكولاتة');
+});
+
+test('deleting pending order does not create a sale and pending orders survive sanitization', () => {
+  const state = addPendingOrder(sanitizeState({ baseCapital: 5000 }), { amount: 150, title: 'خبز' });
+  const restored = sanitizeState(JSON.parse(JSON.stringify(state)));
+  assert.equal(restored.pendingOrders.length, 1);
+  const deleted = deletePendingOrder(restored, restored.pendingOrders[0].id);
+  assert.equal(deleted.pendingOrders.length, 0);
+  assert.equal(deleted.transactions.length, 0);
+  assert.equal(calculateTotals(deleted).salesTotal, 0);
 });
