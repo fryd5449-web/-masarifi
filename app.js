@@ -4,7 +4,7 @@ import { createStatement, buildStatementHtml } from './statement.js';
 const $ = (selector) => document.querySelector(selector);
 let state = loadState();
 const elements = {
-  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), modalBackdrop: $('#modalBackdrop'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), formError: $('#formError'),
+  baseCapital: $('#baseCapital'), capitalValue: $('#capitalValue'), capitalEditForm: $('#capitalEditForm'), salesValue: $('#salesValue'), profitValue: $('#profitValue'), profitCaption: $('#profitCaption'), profitPanel: $('#profitPanel'), operationsList: $('#operationsList'), modalBackdrop: $('#modalBackdrop'), modalTitle: $('#modalTitle'), transactionForm: $('#transactionForm'), transactionId: $('#transactionId'), transactionType: $('#transactionType'), transactionAmount: $('#transactionAmount'), transactionTitle: $('#transactionTitle'), titleLabel: $('#titleLabel'), transactionNote: $('#transactionNote'), transactionDate: $('#transactionDate'), formError: $('#formError'),
 };
 
 function loadState() {
@@ -45,7 +45,7 @@ function renderOperations(container, transactions) {
   visible.forEach((transaction) => {
     const row = document.createElement('article'); row.className = 'operation';
     const main = document.createElement('div'); main.className = 'operation-main';
-    const title = document.createElement('div'); title.className = 'operation-title'; title.textContent = transaction.title || (transaction.type === 'sale' ? 'بيع' : 'مشتريات');
+    const title = document.createElement('div'); title.className = 'operation-title'; title.textContent = transaction.title || (container.closest('.list-card') ? (transaction.type === 'sale' ? 'بيع' : 'مشتريات') : '');
     const meta = document.createElement('div'); meta.className = 'operation-meta'; meta.textContent = `${formatDate(transaction.createdAt)}${transaction.note ? ` · ${transaction.note}` : ''}`; main.append(title, meta);
     const side = document.createElement('div'); side.className = 'operation-side';
     const type = document.createElement('span'); type.className = 'operation-type'; type.textContent = transaction.type === 'sale' ? 'مبيعات' : 'مشتريات';
@@ -53,7 +53,7 @@ function renderOperations(container, transactions) {
     const actions = document.createElement('div'); actions.className = 'operation-actions';
     const edit = document.createElement('button'); edit.className = 'icon-btn'; edit.type = 'button'; edit.textContent = 'تعديل'; edit.addEventListener('click', () => openModal(transaction.type, transaction));
     const remove = document.createElement('button'); remove.className = 'icon-btn delete'; remove.type = 'button'; remove.textContent = 'حذف'; remove.addEventListener('click', () => { const index = state.transactions.findIndex((item) => item.id === transaction.id); if (index >= 0 && window.confirm('حذف هذه العملية؟')) { state.transactions.splice(index, 1); saveState(); renderSummary(); } });
-    actions.append(edit, remove); side.append(type, amount, actions); row.append(main, side); container.append(row);
+    main.prepend(type); actions.append(edit, remove); side.append(amount, actions); row.append(main, side); container.append(row);
   });
 }
 
@@ -64,7 +64,8 @@ function openModal(type, transaction) {
 function closeModal() { elements.modalBackdrop.hidden = true; elements.transactionForm.reset(); elements.formError.textContent = ''; }
 
 document.querySelectorAll('.add-transaction').forEach((button) => button.addEventListener('click', () => openModal(button.dataset.type)));
-$('#saveCapital')?.addEventListener('click', () => { state.baseCapital = toNumber(elements.baseCapital.value); elements.baseCapital.value = state.baseCapital || ''; saveState(); renderSummary(); });
+$('#showCapitalEditor')?.addEventListener('click', () => { elements.baseCapital.value = state.baseCapital || ''; elements.capitalEditForm.hidden = false; elements.baseCapital.focus(); });
+$('#saveCapital')?.addEventListener('click', () => { state.baseCapital = toNumber(elements.baseCapital.value); elements.baseCapital.value = state.baseCapital || ''; saveState(); elements.capitalEditForm.hidden = true; renderSummary(); });
 $('#closeModal').addEventListener('click', closeModal); $('#cancelModal').addEventListener('click', closeModal); elements.modalBackdrop.addEventListener('click', (event) => { if (event.target === elements.modalBackdrop) closeModal(); });
 elements.transactionForm.addEventListener('submit', (event) => {
   event.preventDefault(); const amount = toNumber(elements.transactionAmount.value); const date = elements.transactionDate.value;
